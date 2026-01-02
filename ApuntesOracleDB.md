@@ -1,69 +1,190 @@
-# Oracle DB
-## Comandos útiles (metadatos)
-select table_name from all_tables; -- Listar todas las tablas
-select table_name from user_tables; -- Listar tablas del usuario actual
-desc nombre_tabla; -- Describir la estructura de una tabla
-select sysdate from dual; -- Obtener la fecha y hora actual del sistema
-select user from dual; -- Obtener el usuario actual
+# Oracle DB: Guía de Referencia Rápida
 
-## Consultas básicas
-### SELECT
-select * from EMPLEADOS; -- Seleccionar todos los registros de una tabla
-select nombre, salario from EMPLEADOS where salario > 50000; -- Seleccionar columnas específicas con condición
+## 1. Comandos útiles (Metadatos y Sistema)
 
-#### Conjunto de datos
-select nombre, salario from EMPLEADOS where departamento in ('Ventas', 'Marketing'); -- Filtrar y ordenar resultados
+Consultas para obtener información sobre la base de datos y el entorno.
 
-#### Rangos
-select nombre, salario from EMPLEADOS where salario between 40000 and 80000; -- Filtrar por rango de valores
+**Listar todas las tablas (incluso las del sistema)**
+```sql
+SELECT table_name FROM all_tables;
+```
 
-#### Patrones
-select nombre, salario from EMPLEADOS where nombre like 'J%'; -- Filtrar por patrón de texto
+**Listar solo las tablas del usuario actual**
+```sql
+SELECT table_name FROM user_tables;
+```
 
-#### Operadores lógicos
-select nombre, salario from EMPLEADOS where salario > 50000 and departamento = 'Ventas'; -- Usar operadores lógicos
+**Describir la estructura de una tabla (columnas y tipos)**
+```sql
+DESC nombre_tabla;
+```
 
-#### Personalizar fecha
-select nombre, to_char(fecha_contratacion, 'YYYY-MM-DD') from EMPLEADOS where fecha_contratacion > to_date('2020-01-01', 'YYYY-MM-DD'); -- Filtrar por fecha personalizada
+**Obtener la fecha y hora actual del sistema**
+```sql
+SELECT sysdate FROM dual;
+```
 
-#### Eliminar duplicados
-select distinct departamento from EMPLEADOS; -- Seleccionar valores únicos
+**Obtener el usuario actual**
+```sql
+SELECT user FROM dual;
+```
 
-#### Media, suma, máximo y mínimo
-select avg(salario) from EMPLEADOS; -- Calcular la media de una columna
-select sum(salario) from EMPLEADOS; -- Calcular la suma de una columna
-select max(salario) from EMPLEADOS; -- Obtener el valor máximo de una columna
-select min(salario) from EMPLEADOS; -- Obtener el valor mínimo de una columna
+---
 
-#### Contar registros
-select count(*) from EMPLEADOS; -- Contar el número de registros
+## 2. Consultas Básicas (DML)
 
-#### Contar distintos 
-select count(distinct departamento) from EMPLEADOS; -- Contar valores distintos en una columna
+### SELECT: Recuperación de datos
 
-### INSERT
-insert into EMPLEADOS (nombre, salario, departamento) values ('Juan Perez', 60000, 'Ventas'); -- Insertar un nuevo registro
+**Seleccionar todos los registros**
+```sql
+SELECT * FROM EMPLEADOS;
+```
 
-### UPDATE
-update EMPLEADOS set salario = salario * 1.1 where departamento = 'Ventas'; -- Actualizar registros existentes
+**Proyección y selección (Columnas específicas con condición)**
+```sql
+SELECT nombre, salario 
+FROM EMPLEADOS 
+WHERE salario > 50000;
+```
 
-### DELETE
-delete from EMPLEADOS where nombre = 'Juan Perez'; -- Eliminar registros
+**Filtrar por conjunto de datos (IN)**
+```sql
+SELECT nombre, salario 
+FROM EMPLEADOS 
+WHERE departamento IN ('Ventas', 'Marketing');
+```
 
-### Subconsultas
-select nombre from EMPLEADOS where salario > (select avg(salario) from EMPLEADOS); -- Usar subconsulta en condición
+**Filtrar por rangos (BETWEEN)**
+```sql
+SELECT nombre, salario 
+FROM EMPLEADOS 
+WHERE salario BETWEEN 40000 AND 80000;
+```
 
-#### Subconsultas con EXISTS
-select nombre from empleados where exists (select *
-from familiares where nss = empleados.nss and relacion = 'hija'); -- Filtrar registros basados en la existencia de registros relacionados
+**Filtrar por patrón de texto (LIKE)**
+* `%`: Cualquier cadena de caracteres.
+* `_`: Un solo carácter.
+```sql
+SELECT nombre, salario 
+FROM EMPLEADOS 
+WHERE nombre LIKE 'J%';
+```
 
-## Comandos
-### Crear fichero de comandos
-edit nombre_fichero.sql; -- Crear o editar un fichero de comandos
+**Operadores lógicos (AND, OR)**
+```sql
+SELECT nombre, salario 
+FROM EMPLEADOS 
+WHERE salario > 50000 AND departamento = 'Ventas';
+```
 
-### Ejecutar fichero de comandos
-@nombre_fichero.sql; -- Ejecutar un fichero de comandos
+**Manejo de fechas (TO_CHAR y TO_DATE)**
+```sql
+SELECT nombre, TO_CHAR(fecha_contratacion, 'YYYY-MM-DD') 
+FROM EMPLEADOS 
+WHERE fecha_contratacion > TO_DATE('2020-01-01', 'YYYY-MM-DD');
+```
 
-### Grabar historial de comandos
-spool nombre_fichero; -- Iniciar grabación del historial
-spool off; -- Detener grabación del historial
+**Eliminar duplicados en la salida**
+```sql
+SELECT DISTINCT departamento FROM EMPLEADOS;
+```
+
+### Funciones de Agregación
+
+**Calcular la media (AVG)**
+```sql
+SELECT AVG(salario) FROM EMPLEADOS;
+```
+
+**Calcular la suma (SUM)**
+```sql
+SELECT SUM(salario) FROM EMPLEADOS;
+```
+
+**Obtener el máximo (MAX)**
+```sql
+SELECT MAX(salario) FROM EMPLEADOS;
+```
+
+**Obtener el mínimo (MIN)**
+```sql
+SELECT MIN(salario) FROM EMPLEADOS;
+```
+
+**Contar total de registros**
+```sql
+SELECT COUNT(*) FROM EMPLEADOS;
+```
+
+**Contar valores distintos**
+```sql
+SELECT COUNT(DISTINCT departamento) FROM EMPLEADOS;
+```
+
+---
+
+### Modificación de Datos
+
+**INSERT: Insertar un nuevo registro**
+```sql
+INSERT INTO EMPLEADOS (nombre, salario, departamento) 
+VALUES ('Juan Perez', 60000, 'Ventas');
+```
+
+**UPDATE: Actualizar registros existentes**
+```sql
+UPDATE EMPLEADOS 
+SET salario = salario * 1.1 
+WHERE departamento = 'Ventas';
+```
+
+**DELETE: Eliminar registros**
+```sql
+DELETE FROM EMPLEADOS 
+WHERE nombre = 'Juan Perez';
+```
+
+---
+
+## 3. Subconsultas
+
+**Subconsulta escalar en WHERE**
+Selecciona empleados que ganan más que la media.
+```sql
+SELECT nombre 
+FROM EMPLEADOS 
+WHERE salario > (SELECT AVG(salario) FROM EMPLEADOS);
+```
+
+**Subconsulta con EXISTS (Correlacionada)**
+Filtrar empleados que tienen al menos una hija (basado en tabla relacionada).
+```sql
+SELECT nombre 
+FROM empleados 
+WHERE EXISTS (SELECT * FROM familiares WHERE nss = empleados.nss AND relacion = 'hija');
+```
+
+---
+
+## 4. Comandos de SQL*Plus (Entorno)
+
+Estos comandos son específicos de la herramienta cliente, no del lenguaje SQL estándar.
+
+**Crear o editar un fichero de comandos**
+Abre el editor definido (ej. vi o notepad).
+```sql
+edit nombre_fichero.sql
+```
+
+**Ejecutar un fichero de comandos**
+```sql
+@nombre_fichero.sql
+```
+
+**Grabar historial (Spool)**
+Guarda la salida de la consola en un archivo de texto.
+```sql
+spool nombre_fichero  -- Iniciar grabación
+-- ... tus consultas aquí ...
+spool off             -- Detener y guardar
+```
